@@ -1,0 +1,68 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+*{
+  border-radius: 0 !important;
+}
+
+.btn-xlarge {
+    padding: 15px 28px;
+    font-size: 22px;
+    font: bold;
+    line-height: normal;
+    -webkit-border-radius: 8px;
+       -moz-border-radius: 8px;
+            border-radius: 8px;
+}
+
+input.form-fixer {
+    padding: 7px;
+}
+
+$(function () {
+        $('#PuDate').datetimepicker({
+            format: 'DD-MM-YYYY HH:mm',
+            minDate: new Date(),
+            stepping: 15,
+            sideBySide: true,
+          autoclose: true
+        });
+  
+       $('#DoDate').datetimepicker({
+            format: 'DD-MM-YYYY HH:mm',
+            minDate: new Date(),
+            stepping: 15,
+            sideBySide: true
+        });
+        
+        
+        $("#PuDate").on("dp.change", function (e) {
+           
+          $('#DoDate').data("DateTimePicker").minDate(e.date);
+          $('.datepicker').hide();
+        });
+    });
+
+var test = new Date('2016-07-20 10:11');
+console.log(test);
