@@ -37,32 +37,26 @@ textarea {
 }
 
 input.form-fixer {
-    padding: 7px;
+    padding: 5px;
+}
+.field-validation-error {
+    color: #cc0000
 }
 
-$(function () {
-        $('#PuDate').datetimepicker({
-            format: 'DD-MM-YYYY HH:mm',
-            minDate: new Date(),
-            stepping: 15,
-            sideBySide: true,
-          autoclose: true
-        });
-  
-       $('#DoDate').datetimepicker({
-            format: 'DD-MM-YYYY HH:mm',
-            minDate: new Date(),
-            stepping: 15,
-            sideBySide: true
-        });
-        
-        
-        $("#PuDate").on("dp.change", function (e) {
-           
-          $('#DoDate').data("DateTimePicker").minDate(e.date);
-          $('.datepicker').hide();
-        });
-    });
-
-var test = new Date('2016-07-20 10:11');
-console.log(test);
+.input-xs { /*augintiniai*/
+    padding:5px;
+}
+body {
+    background: rgba(0, 0, 0, 0) url("http://greenmotion.com/images/tracks.png") no-repeat scroll 100% top / cover ;
+    color: #fff;
+    height: auto;
+    padding: 153px;
+    position: relative;
+    vertical-align:baseline;
+    float:right;
+    background-position: bottom;
+}
+.form-group label{
+    font-family: sans-serif;
+    color: #fff;
+}
