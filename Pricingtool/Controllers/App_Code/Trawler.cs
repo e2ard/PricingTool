@@ -52,6 +52,11 @@ namespace PricingTool.MVC.Controllers.App_Code
                 pattern = "LocationCode%22%3A%22";
                 matchDetails = Regex.Match(GetSiteName(), pattern + "\\d*");
             }
+            if (matchDetails.Captures.Count == 0)
+            {
+                pattern = "LocationCode%22:";
+                matchDetails = Regex.Match(GetSiteName(), pattern + "\\d*");
+            }
             string temp = matchDetails.Captures[0].Value;
             return temp.Substring(pattern.Length, temp.Length - pattern.Length);
         }

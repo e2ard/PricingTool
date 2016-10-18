@@ -226,7 +226,7 @@ public class JOffer
             if (sup.name.Equals(""))
                 return "-" + " " + sup.price + "\n";
             else
-                return sup.name.ToLower().Substring(0, 4) + " " + sup.price + "\n";
+                return (sup.name.Length < 4? sup.name: sup.name.ToLower().Substring(0, 4)) + " " + sup.price + "\n";
         }
         return "";
     }
@@ -373,10 +373,14 @@ public class JOffer
             case "IFMR":
             case "IFMN":
             case "SFMR":
+            case "CFMR":
+            case "EFMR":
                 return "SUVM";
             case "IFAR":
             case "IFAN":
             case "SFAR":
+            case "CFAR":
+            case "EFAR":
                 return "SUVA";
             case "PWMR":
             case "SVMR":

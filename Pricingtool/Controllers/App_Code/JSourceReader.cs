@@ -23,98 +23,9 @@ namespace PricingTool.MVC.Controllers.App_Code
         public static bool addProxy = true;//if true then add
         public static string user = "edvard.naus@gmail.com";
         public static string pass = "421c3421c3";
-
-
-
-        public JSourceReader()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
-
-        public List<JOffer> GetTags(string site)
-        {
-            List<JOffer> offers = new List<JOffer>();
-            try
-            {
-                WebClient client = new WebClient();
-                string source = client.DownloadString(site);
-                //retrieve page source tags
-                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-                doc.LoadHtml(source);
-
-                string supplierId = "supplier_id";
-                String now = "now ";
-
-                string carOffer = "car-result group  ";
-                HtmlNodeCollection offersFound = doc.DocumentNode.SelectNodes(".//div[contains(@class,'" + carOffer + "')]");
-                if (offersFound == null)
-                {
-                    Console.Write("-------?Fix started");
-                    carOffer = "search-result txt-grey-7  ";
-                    offersFound = doc.DocumentNode.SelectNodes(".//div[contains(@class,'" + carOffer + "')]");
-                }
-
-
-                if (offersFound != null)
-                {
-                    foreach (HtmlNode mainNode in offersFound)
-                    {
-                        HtmlNode priceNode = mainNode.SelectSingleNode(".//p[@class='" + now + "']");
-                        string price = string.Empty;
-
-                        if (priceNode != null)
-                        {
-                            price = priceNode.InnerText;
-                        }
-                        else
-                        {
-                            now = "now";
-                            priceNode = mainNode.SelectSingleNode(".//p[@class='" + now + "']");
-                            if (priceNode != null)
-                            {
-                                price = priceNode.InnerText;
-                            }
-                            else
-                            {
-                                Debug.WriteLine("-------------> price not pursed");
-                            }
-                        }
-
-                        HtmlNode supplierNode = mainNode.SelectSingleNode(".//div[contains(@class,'" + supplierId + "')]/img");
-                        string supplier = string.Empty;
-
-                        if (supplierNode != null)
-                        {
-                            supplier = supplierNode.Attributes["title"].Value;
-                        }
-                        else
-                        {
-                            supplierId = "col dbl info-box supplier";
-                            supplierNode = mainNode.SelectSingleNode(".//div[contains(@class,'" + supplierId + "')]/img");
-                            if (supplierNode != null)
-                            {
-                                supplier = supplierNode.Attributes["title"].Value;
-                            }
-                        }
-
-                        JOffer offer = new JOffer(supplier, price);
-                        offer.SetSiteName(site);
-                        offers.Add(offer);
-                    }
-                }
-                else
-                    System.Diagnostics.Debug.WriteLine("JSOURCEREDAER 0 offer number ");
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("GetTAGS EXCEPTION" + e.ToString());
-
-            }
-            return offers;
-        }
-
+        
+        public JSourceReader(){}
+        
         public JOffer GetMinOffer(List<JOffer> offers)
         {
             float minPrice = 999999;
@@ -159,12 +70,11 @@ namespace PricingTool.MVC.Controllers.App_Code
                     HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
                     doc.LoadHtml(source);
 
-                    string carOffer = "car-result group ";
-                    HtmlNodeCollection offersFound = doc.DocumentNode.SelectNodes(".//div[contains(@class,'" + carOffer + "')]");
-                    if (offersFound == null)
+                    string[] carOfferStrgs = { "car-result group ", "search-result txt-grey-7 ", "carResultDiv " };
+                    HtmlNodeCollection offersFound = null;
+                    for(int i = 0; i < carOfferStrgs.Count() && offersFound == null; i++)
                     {
-                        carOffer = "search-result txt-grey-7 ";
-                        offersFound = doc.DocumentNode.SelectNodes(".//div[contains(@class,'" + carOffer + "')]");
+                        offersFound = doc.DocumentNode.SelectNodes(".//div[contains(@class,'" + carOfferStrgs[i] + "')]");
                     }
                     return offersFound;
                 }
@@ -184,82 +94,66 @@ namespace PricingTool.MVC.Controllers.App_Code
                 foreach (HtmlNode mainNode in resultGroups)
                 {
                     //price ------------------------------------------------
-                    string now = "now ";
-                    HtmlNode priceNode = mainNode.SelectSingleNode(".//p[@class='" + now + "']");
+                    string[] priceStrgs = { ".//p[@class='now ']", ".//p[@class='now']", ".//span[@class='carResultRow_Price-now']" };
+                    HtmlNode priceNode = null;
                     string price = string.Empty;
-                    if (priceNode != null)
-                        price = priceNode.InnerText;
-                    else
+                    for (int i = 0; i < priceStrgs.Count() && priceNode == null; i++)
                     {
-                        now = "now";
-                        priceNode = mainNode.SelectSingleNode(".//p[@class='" + now + "']");
+                        priceNode = mainNode.SelectSingleNode(priceStrgs[i]);
                         if (priceNode != null)
                             price = priceNode.InnerText;
-                        else
-                            Debug.WriteLine("-------------> price not pursed");
                     }
+                    if (priceNode == null)
+                        Debug.WriteLine("--------------->Price not pursed----------------");
                     //supplier ------------------------------------------------
                     string supplier = string.Empty;
-                    string supplierId = "supplier_id";
-                    HtmlNode supplierNode = mainNode.SelectSingleNode(".//div[@class='" + supplierId + "']/img");
-                    if (supplierNode != null)
-                        supplier = supplierNode.Attributes["title"].Value;
-                    else
+                    string[] supplierStrgs = { ".//div[@class='supplier_id']/img", ".//div[@class='col dbl info-box supplier']/img", ".//div[@class='carResultRow_OfferInfo_Supplier-wrap']/img" };
+                    HtmlNode supplierNode = null;
+                    for (int i = 0; i < supplierStrgs.Count() && supplierNode == null; i++)
                     {
-                        supplierId = "col dbl info-box supplier";
-                        supplierNode = mainNode.SelectSingleNode(".//div[@class='" + supplierId + "']/img");
+                        supplierNode = mainNode.SelectSingleNode(supplierStrgs[i]);
                         if (supplierNode != null)
                             supplier = supplierNode.Attributes["title"].Value;
-                        else
-                            Debug.WriteLine("-------------> supplier not pursed");
                     }
+                    if (supplierNode == null)
+                        Debug.WriteLine("Suppliernot pursed -------------------------------");
                     //category ------------------------------------------------
                     string category = string.Empty;
-                    string categoryStr = "bg-yellow-5";
-                    HtmlNode categoryNode = mainNode.SelectSingleNode(".//p[contains(@class,'" + categoryStr + "')]");
-                    if (categoryNode != null)
-                        category = categoryNode.InnerText;
-                    else
+                    string[] categoryStrs = { ".//p[contains(@class,'bg-yellow-5')]", ".//span[contains(@class,'class mini')]", ".//span[contains(@class,'carResultRow_CarSpec_CarCategory')]"};
+                    HtmlNode categoryNode = null;
+                    for(int i = 0; i <= categoryStrs.Count() && categoryNode == null; i++)
                     {
-                        categoryStr = "class mini";
-                        categoryNode = mainNode.SelectSingleNode(".//span[contains(@class,'" + categoryStr + "')]");
+                        categoryNode = mainNode.SelectSingleNode(categoryStrs[i]);
                         if (categoryNode != null)
                             category = categoryNode.InnerText;
-                        else
-                            Debug.WriteLine("-------------> category not pursed");
                     }
+                    if (categoryNode == null)
+                        Debug.WriteLine("-------------> category not pursed");
                     //transmission ------------------------------------------------
                     string transm = string.Empty;
-                    string transmStr = "result_trans";
-                    HtmlNode transmNode = mainNode.SelectSingleNode(".//li[contains(@class,'" + transmStr + "')]");
-                    if (transmNode != null)
-                        transm = transmNode.InnerText;
-                    else
+                    string[] transmStrgs = { ".//li[contains(@class,'result_trans')]", ".//span[contains(@class,'class mini')]", ".//ul[contains(@class, 'carResultRow_CarSpec-tick')]/li[last()]" };
+                    HtmlNode transmNode = null;
+                    for(int i = 0; i < transmStrgs.Count() && transmNode == null; i++)
                     {
-                        transmStr = "class mini";
-                        transmNode = mainNode.SelectSingleNode(".//span[contains(@class,'" + transmStr + "')]");
+                        transmNode = mainNode.SelectSingleNode(transmStrgs[i]);
                         if (transmNode != null)
                             transm = transmNode.InnerText;
-                        else
-                            Debug.WriteLine("-------------> transm not pursed");
                     }
+                    if (transmNode == null)
+                        Debug.WriteLine("-------------> transm not pursed");
                     //seats
                     string seats = string.Empty;
-                    string seatsStr = "result_seats";
-                    HtmlNode seatsNode = mainNode.SelectSingleNode(".//li[contains(@class,'" + seatsStr + "')]");
-                    if (seatsNode != null)
-                        seats = seatsNode.InnerText;
-                    else
+                    string[] seatsStrgs = { ".//li[contains(@class,'result_seats')]", ".//span[contains(@class,'class mini')]", ".//li[contains(@class,'carResultRow_CarSpec_Seats')]" };
+                    HtmlNode seatsNode = null;
+                    for(int i = 0; i < seatsStrgs.Count() && seatsNode == null; i++)
                     {
-                        seatsStr = "class mini";
-                        seatsNode = mainNode.SelectSingleNode(".//span[contains(@class,'" + seatsStr + "')]");
+                        seatsNode = mainNode.SelectSingleNode(seatsStrgs[i]);
                         if (seatsNode != null)
                             seats = seatsNode.InnerText;
-                        else
-                            Debug.WriteLine("-------------> seats not pursed");
                     }
-                    //Console.WriteLine(supplier + "-" + price + "-" + category+ "-" + transm.Trim().Split(' ')[0].ToCharArray()[0]);
-                    //Debug.WriteLine("-------------> seats pursed" + seats.Trim()[0]);
+                    if (seatsNode == null)
+                        Debug.WriteLine("-------------> seats not pursed");
+
                     JOffer o = setOfferValues(supplier, price, category, transm, seats);
                     offers.Add(o);
                 }

@@ -161,7 +161,7 @@ namespace PricingTool.MVC.Controllers.App_Code
         public void AddSuppliers(string supplier)
         {
             if (supplier != null && !suppliers.Contains(supplier))
-                suppliers += supplier + "- " + supplier.Substring(0, 4) + "\n";
+                suppliers += supplier + "- " + (supplier.Length < 4? supplier: supplier.Substring(0, 4)) + "\n";
         }
 
         public void Dispose()

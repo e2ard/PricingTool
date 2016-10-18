@@ -7,7 +7,7 @@ namespace PricingTool.MVC.Models.Dal
 {
     public class PricingToolDal
     {
-        public static SelectList GetSources()
+        public SelectList GetSources()
         {
             return new SelectList(new List<SelectListItem>{
                   new SelectListItem{ Selected = false,Text = "RentalCars", Value = "1"},
@@ -17,17 +17,18 @@ namespace PricingTool.MVC.Models.Dal
             }, "Value", "Text");
         }
 
-        public static SelectList GetCoutries()
+        public SelectList GetCoutries()
         {
             return new SelectList(new List<SelectListItem>{
                   new SelectListItem{ Selected = false,Text = "Latvia", Value = "1"},
                   new SelectListItem {Selected = false, Text = "Lithuania", Value = "2"},
                   new SelectListItem{ Selected = false,Text = "Poland", Value = "3"},
-                  new SelectListItem{ Selected = false,Text = "UK", Value = "4"}
+                  //new SelectListItem{ Selected = false,Text = "UK", Value = "4"},
+                  //new SelectListItem{ Selected = false,Text = "Italy", Value = "5"}
             }, "Value", "Text");
         }
 
-        public static SelectList GetLocations()
+        public SelectList GetLocations()
         {
             return new SelectList(new List<SelectListItem>(), "Value", "Text");
         }

@@ -1,5 +1,6 @@
 ﻿using PricingTool.MVC.Controllers.App_Code;
 using PricingTool.MVC.Models;
+using PricingTool.MVC.Models.Dal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace getLayout.Controllers
 {
     public class HomeController : Controller
     {
+        PricingToolDal dal = new PricingToolDal();
         public ActionResult Index(string returnUrl)
         {
             //ViewBag.ReturnUrl = returnUrl;
@@ -22,14 +24,18 @@ namespace getLayout.Controllers
 
         public ActionResult SearchFilterPartial()
         {
-            SearchFilters sf = new SearchFilters();
-            sf.Location = 3;
-            return View(sf);
+            ViewBag.Locations = dal.GetLocations();
+            ViewBag.Sources = dal.GetSources();
+            ViewBag.Countries = dal.GetCoutries();
+            return View(new SearchFilters());
         }
 
         [HttpPost]
         public ActionResult SearchFilterPartial(SearchFilters searchFilters)
         {
+            ViewBag.Locations = dal.GetLocations();
+            ViewBag.Sources = dal.GetSources();
+            ViewBag.Countries = dal.GetCoutries();
             string fileName = "/pdf/rentalcars6-6Kaunas.pdf";
             try
             {
@@ -151,16 +157,19 @@ namespace getLayout.Controllers
         {
             DateTime sDate = searchFilters.PuDate;
             DateTime eDate = searchFilters.DoDate;
+            sDate = sDate.Add(searchFilters.PuTime);
+            eDate = eDate.Add(searchFilters.DoTime);
 
             Trawler s = new Trawler(Const.Locations[searchFilters.Location].CarTrawler);
-            
             s.InitDate(sDate);
+            
             PdfBuilder pdf = new PdfBuilder(s);
             pdf.CreateHeaders();
 
             int numOfIterations = (eDate - sDate).Days;
 
             List<string> links = s.GetGeneratedLinksByDate(sDate, eDate);
+
             List<JOffer> minOffers = new List<JOffer>();
 
             Dictionary<string, Dictionary<string, JOffer>> offerMap = new Dictionary<string, Dictionary<string, JOffer>>();
@@ -217,6 +226,10 @@ namespace getLayout.Controllers
                         {
                             map[item.Name].SetSiteName(link);
                             offers.Add(map[item.Name]);
+                        }
+                        else
+                        {
+                            offers.Add(new JOffer());
                         }
                     }
                 }
@@ -400,10 +413,16 @@ namespace getLayout.Controllers
                     sl.Add(new SelectListItem { Selected = false, Text = "Kaunas", Value = "2" });
                     break;
                 case 3:
-                    sl.Add(new SelectListItem { Selected = false, Text = "Warsaw", Value = "4" });
+                    sl.Add(new SelectListItem { Selected = false, Text = "Warsaw (Chopin)", Value = "4" });
+                    sl.Add(new SelectListItem { Selected = false, Text = "Warsaw (Modlin)", Value = "9" });
                     break;
                 case 4:
                     sl.Add(new SelectListItem { Selected = false, Text = "London", Value = "5" });
+                    break;
+                case 5:
+                    sl.Add(new SelectListItem { Selected = false, Text = "Fiumicino", Value = "6" });
+                    sl.Add(new SelectListItem { Selected = false, Text = "Rome", Value = "7" });
+                    sl.Add(new SelectListItem { Selected = false, Text = "Bologna", Value = "8" });
                     break;
                 default:
                     break;
