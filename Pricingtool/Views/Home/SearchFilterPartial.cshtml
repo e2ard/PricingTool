@@ -182,7 +182,6 @@
         @Html.ValidationMessageFor(model => model.Country)
         @Html.ValidationMessageFor(model => model.Location)
     </div>
-    @*@using (Ajax.BeginForm("SearchFilterPartial", new AjaxOptions { UpdateTargetId = "divLoading2",  OnComplete = "StopLoading()", OnSuccess = "StartLoading()"}))*@
     @using (Html.BeginForm("SearchFilterPartial"))
     {
         @Html.AntiForgeryToken()
