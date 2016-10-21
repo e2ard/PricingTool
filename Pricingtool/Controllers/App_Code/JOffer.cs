@@ -226,7 +226,7 @@ public class JOffer
             if (sup.name.Equals(""))
                 return "-" + " " + sup.price + "\n";
             else
-                return (sup.name.Length < 4? sup.name: sup.name.ToLower().Substring(0, 4)) + " " + sup.price + "\n";
+                return sup.name.ToLower().Substring(0, 4) + " " + sup.price + "\n";
         }
         return "";
     }

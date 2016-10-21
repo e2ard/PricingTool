@@ -36,7 +36,7 @@ namespace getLayout.Controllers
             ViewBag.Locations = dal.GetLocations();
             ViewBag.Sources = dal.GetSources();
             ViewBag.Countries = dal.GetCoutries();
-            string fileName = "/pdf/rentalcars6-6Kaunas.pdf";
+            string fileName = "/pdf/rentalcars10-21Rome.pdf";
             try
             {
                 if (ModelState.IsValid)
@@ -57,6 +57,7 @@ namespace getLayout.Controllers
                             break;
                     }
                     byte[] fileBytes = System.IO.File.ReadAllBytes(Server.MapPath("~/" + fileName));
+                    ViewBag.Message = "Done";
                     return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName.Substring(5, fileName.Length - 5));
                 }
             }
@@ -66,6 +67,36 @@ namespace getLayout.Controllers
                 //Response.Write("<script>alert('Proxy Error');</script>");
             }
             return View(searchFilters);
+        }
+
+        public string GetResultFileName(SearchFilters searchFilters)
+        {
+            ViewBag.Locations = dal.GetLocations();
+            ViewBag.Sources = dal.GetSources();
+            ViewBag.Countries = dal.GetCoutries();
+            string fileName = "/pdf/rentalcars10-21Rome.pdf";
+
+            if (ModelState.IsValid)
+            {
+                switch (searchFilters.Source)
+                {
+                    case 1:
+                        fileName = GetRentalPdf(searchFilters);
+                        break;
+                    case 2:
+                        fileName = GetCarTrawlerPdf(searchFilters);
+                        break;
+                    case 3:
+                        fileName = GetScannerPdf(searchFilters);
+                        break;
+                    case 4:
+                        fileName = GetAtlassPdfSync(searchFilters);
+                        break;
+                }
+                return Server.MapPath("~/" + fileName);
+            }
+            else
+                return "";
         }
 
         public string GetRentalPdf(SearchFilters searchFilters)
@@ -157,19 +188,16 @@ namespace getLayout.Controllers
         {
             DateTime sDate = searchFilters.PuDate;
             DateTime eDate = searchFilters.DoDate;
-            sDate = sDate.Add(searchFilters.PuTime);
-            eDate = eDate.Add(searchFilters.DoTime);
 
             Trawler s = new Trawler(Const.Locations[searchFilters.Location].CarTrawler);
+
             s.InitDate(sDate);
-            
             PdfBuilder pdf = new PdfBuilder(s);
             pdf.CreateHeaders();
 
             int numOfIterations = (eDate - sDate).Days;
 
             List<string> links = s.GetGeneratedLinksByDate(sDate, eDate);
-
             List<JOffer> minOffers = new List<JOffer>();
 
             Dictionary<string, Dictionary<string, JOffer>> offerMap = new Dictionary<string, Dictionary<string, JOffer>>();
@@ -226,10 +254,6 @@ namespace getLayout.Controllers
                         {
                             map[item.Name].SetSiteName(link);
                             offers.Add(map[item.Name]);
-                        }
-                        else
-                        {
-                            offers.Add(new JOffer());
                         }
                     }
                 }
@@ -413,8 +437,7 @@ namespace getLayout.Controllers
                     sl.Add(new SelectListItem { Selected = false, Text = "Kaunas", Value = "2" });
                     break;
                 case 3:
-                    sl.Add(new SelectListItem { Selected = false, Text = "Warsaw (Chopin)", Value = "4" });
-                    sl.Add(new SelectListItem { Selected = false, Text = "Warsaw (Modlin)", Value = "9" });
+                    sl.Add(new SelectListItem { Selected = false, Text = "Warsaw", Value = "4" });
                     break;
                 case 4:
                     sl.Add(new SelectListItem { Selected = false, Text = "London", Value = "5" });
@@ -435,7 +458,7 @@ namespace getLayout.Controllers
             };
             return jsonResult;
         }
-    
+
 
         public ActionResult About()
         {
