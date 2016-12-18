@@ -15,7 +15,7 @@
             $('form input, form select, form button').attr("disabled", true);
             $("#divLoading").html("<image src='../Content/ajax-loader.gif' style='width: 16px; height: 16px;' alt='Loading, please wait' />");
         }
-        $(document).ready(function () {
+        @*$(document).ready(function () {
             $('form').submit(function () {
                 $.ajax({
                     url: '@Url.Action("GetResultFileName")',
@@ -24,7 +24,8 @@
                     success: function (result) {
                         StopLoading();
                         console.log(result);
-                        window.open(result, '_blank');
+                        window.open(result, '');
+                        return false;
                     },
                     error: function (result) {
                         StopLoading();
@@ -36,6 +37,34 @@
             });
             $('button').click(function () {
                 $('form').submit();
+            });
+        });*@
+        $(document).ready(function () {
+            $('button').click(function () {
+                $.ajax({
+                    url: '@Url.Action("GetResultFileName")',
+                    type: "POST",
+                    data: $('form').serialize(),
+                    success: function (result) {
+                        StopLoading();
+                        console.log(result);
+                        if (navigator.userAgent.indexOf("Chrome") != -1){
+                            console.log('Chrome');
+                            var popup = window.open("about:blank", "My Page"); 
+                            popup.location = result;
+                        }
+                        else {
+                            window.open(window.location + result, '_blank');
+                        }
+                        return false;
+                    },
+                    error: function (result) {
+                        StopLoading();
+                        alert("Failed");
+                    }
+                });
+                StartLoading();
+                return false;
             });
         });
     </script>

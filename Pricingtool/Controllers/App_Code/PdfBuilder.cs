@@ -29,12 +29,18 @@ namespace PricingTool.MVC.Controllers.App_Code
                 this.SiteName = site;
                 SetDocumentDetails();
 
-                //PATH = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.ToString();
                 PATH = HttpContext.Current.Server.MapPath("~/");
-                fileName = "\\pdf\\" + documentTitle + puMonth + "-" + puDay + city + ".pdf";
-
-                FileStream fs = new FileStream(PATH + fileName, FileMode.Create, FileAccess.Write, FileShare.None);
-
+                fileName = "\\pdf\\" + documentTitle + puMonth + "-" + puDay + city;
+                FileStream fs;
+                try
+                {
+                    fs = new FileStream(PATH + fileName + ".pdf", FileMode.Create, FileAccess.Write, FileShare.None);
+                }
+                catch(IOException ioe)
+                {
+                    fs = new FileStream(PATH +  fileName + "(1).pdf", FileMode.Create, FileAccess.Write, FileShare.None);
+                }
+                fileName += ".pdf";
                 doc = new Document(PageSize.A4, 10, 10, 10, 10);
                 doc.SetPageSize(iTextSharp.text.PageSize.A4.Rotate());
                 PdfWriter writer = PdfWriter.GetInstance(doc, fs);
@@ -121,7 +127,7 @@ namespace PricingTool.MVC.Controllers.App_Code
 
             for (int i = 0; i < Const.categories.Count; i++)
             {
-                cell = new PdfPCell(new Phrase(Const.categories.ElementAt(i).PdfClass, font));
+                cell = new PdfPCell(new Phrase(Const.categories.ElementAt(i).PdfClass.ToLower(), font));
                 table.AddCell(cell);
             }
 
@@ -161,7 +167,7 @@ namespace PricingTool.MVC.Controllers.App_Code
         public void AddSuppliers(string supplier)
         {
             if (supplier != null && !suppliers.Contains(supplier))
-                suppliers += supplier + "- " + supplier.Substring(0, 4) + "\n";
+                suppliers += supplier + "- " + (supplier.Length > 3 ? supplier.ToLower().Substring(0, 4) : supplier.ToLower().Substring(0, 3)) + "\n";
         }
 
         public void Dispose()

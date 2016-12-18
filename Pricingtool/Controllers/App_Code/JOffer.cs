@@ -23,11 +23,6 @@ public class JOffer
     public string category;
     public string seats;
 
-    public Supplier Other = new Supplier();
-    public Supplier GMotion = new Supplier();
-    public Supplier CRent = new Supplier();
-    public Supplier Best = new Supplier();
-
     public JOffer(String splr, String prc)
     {
         Debug.WriteLine(splr);
@@ -38,24 +33,20 @@ public class JOffer
            case "GREEN_MOTION":
                 SetGM(splr);
                 SetGMPrice(prc);
-                //GMotion = new Supplier { name = splr, price = float.Parse(Regex.Match(prc.Replace(',', '.'), "\\d+\\.?\\d+").Value) };
                 break;
             case "CARSRENT":
             case "CARS RENT":
             case "CARS_RENT":
                 SetCR(splr);
                 SetCRPrice(prc);
-              //  CRent = new Supplier { name = splr, price = float.Parse(Regex.Match(prc.Replace(',', '.'), "\\d+\\.?\\d+").Value) };
                 break;
             case "":
-                //Best = new Supplier { name = splr, price = float.Parse(Regex.Match(prc.Replace(',', '.'), "\\d+\\.?\\d+").Value) };
                 SetBest("MyB");
                 SetBestPrice(prc);
                 break;
             default:
                 SetSupplier(splr);
                 SetPrice(prc);
-                //Other = new Supplier { name = splr, price = float.Parse(Regex.Match(prc.Replace(',', '.'), "\\d+\\.?\\d+").Value) };
                 break;
         }
     }
@@ -73,14 +64,12 @@ public class JOffer
             case "GREEN_MOTION":
                 SetGM(splr);
                 SetGMPrice(prc);
-                GMotion = new Supplier { name = splr, price = prc };
                 break;
             case "CARSRENT":
             case "CARS RENT":
             case "CARS_RENT":
                 SetCR(splr);
                 SetCRPrice(prc);
-                CRent = new Supplier { name = splr, price = prc };
                 break;
             case "":
                 SetBest("MyB");
@@ -89,7 +78,6 @@ public class JOffer
             default:
                 SetSupplier(splr);
                 SetPrice(prc);
-                Other = new Supplier { name = splr, price = prc };
                 break;
         }
     }
@@ -123,7 +111,7 @@ public class JOffer
 
     public void SetPrice(string price)
     {
-        this.price = float.Parse(Regex.Match(price.Replace(',', '.'), "\\d+\\.?\\d+").Value);
+        this.price = (float)Math.Round(float.Parse(Regex.Match(price.Replace(',', '.'), "\\d+\\.?\\d+").Value),2);
     }
 
     public void SetPrice(float price)
@@ -148,7 +136,7 @@ public class JOffer
 
     public void SetGMPrice(String price)
     {
-        this.gmPrice = float.Parse(Regex.Match(price.Replace(',', '.'), "\\d+\\.?\\d+").Value);
+        this.gmPrice =(float) Math.Round(float.Parse(Regex.Match(price.Replace(',', '.'), "\\d+\\.?\\d+").Value), 2);
     }
 
     public void SetGMPrice(float price)
@@ -226,7 +214,7 @@ public class JOffer
             if (sup.name.Equals(""))
                 return "-" + " " + sup.price + "\n";
             else
-                return sup.name.ToLower().Substring(0, 4) + " " + sup.price + "\n";
+                return (sup.name.Length > 3? sup.name.ToLower().Substring(0, 4): sup.name.ToLower().Substring(0, 3)) + " " + sup.price + "\n";
         }
         return "";
     }
@@ -334,11 +322,15 @@ public class JOffer
             case "EDMN":
             case "ECMN":
             case "ECMR":
+            case "EWMR":
+            case "EWMH":
                 return "EconomyM";
             case "EDAR":
             case "ECAR":
             case "ECAN":
             case "EDAN":
+            case "EWAR":
+            case "EWAH":
                 return "EconomyA";
             case "CDMR":
             case "CCMR":
@@ -370,17 +362,23 @@ public class JOffer
             case "IWAR":
             case "CWAR":
                 return "EstateA";
-            case "IFMR":
-            case "IFMN":
-            case "SFMR":
             case "CFMR":
             case "EFMR":
-                return "SUVM";
-            case "IFAR":
-            case "IFAN":
-            case "SFAR":
+                return "CFMR";
             case "CFAR":
             case "EFAR":
+                return "CFAR";
+            case "IFMR":
+            case "IFMD":
+            case "IFMN":
+            case "SFMR":
+            case "PFMR":
+                return "SUVM";
+            case "IFAR":
+            case "IFAD":
+            case "IFAN":
+            case "SFAR":
+            case "PFAR":
                 return "SUVA";
             case "PWMR":
             case "SVMR":

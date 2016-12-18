@@ -124,10 +124,6 @@ namespace PricingTool.MVC.Controllers.App_Code
                 rgx = new Regex(pattern);
                 SetSiteName(rgx.Replace(siteName, replacement));
             }
-            else
-            {
-
-            }
         }
 
         public override void SetDoDay(DateTime date)// set do date

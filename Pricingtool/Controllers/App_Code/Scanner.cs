@@ -14,7 +14,7 @@ public class Scanner : SiteBase
         SetSiteName(site1);
     }
 
-    
+
 
     public override void InitDate(DateTime date)
     {
@@ -31,7 +31,7 @@ public class Scanner : SiteBase
         SetSiteName(rgx.Replace(siteName, dateToChange));
     }
 
-    
+
 
     public override void SetDoDay(DateTime date)
     {

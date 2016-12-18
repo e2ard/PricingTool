@@ -7,7 +7,7 @@ using System.Web.Mvc;
 
 namespace PricingTool.MVC.Models
 {
-    public class SearchFilters
+    public class SearchFilters:IValidatableObject
     {
         [Required(ErrorMessage = "Source not chosen")]
         [Range(1, 100)]
