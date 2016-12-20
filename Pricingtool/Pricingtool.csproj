@@ -427,7 +427,6 @@
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="excel\" />
     <Folder Include="pdf\" />
   </ItemGroup>

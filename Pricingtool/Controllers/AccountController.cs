@@ -12,7 +12,6 @@ using getLayout.Models;
 
 namespace getLayout.Controllers
 {
-    [Authorize]
     public class AccountController : Controller
     {
         private ApplicationSignInManager _signInManager;

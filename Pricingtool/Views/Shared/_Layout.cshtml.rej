@@ -1,0 +1,28 @@
+diff a/Pricingtool/Views/Shared/_Layout.cshtml b/Pricingtool/Views/Shared/_Layout.cshtml	(rejected hunks)
+@@ -27,18 +27,20 @@
+             <div class="navbar-collapse collapse">
+                 <ul class="nav navbar-nav">
+                     @*<li>@Html.ActionLink("Home", "Index", "Home")</li>
+-                    <li>@Html.ActionLink("About", "About", "Home")</li>*@
+-             @*       <li>@Html.ActionLink("Contact", "Contact", "Home")</li>*@
++                        <li>@Html.ActionLink("About", "About", "Home")</li>*@
++                    @*       <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                 </ul>
+-                @*@Html.Partial("_LoginPartial")*@
++                @Html.Partial("_LoginPartial")
+             </div>
+         </div>
+-    </div>
++    </div>*@
+     <div class="container body-content">
+         @RenderBody()
++        @Scripts.Render("~/bundles/modernizr")
++        @Scripts.Render("~/bundles/bootstrap")
++        @RenderSection("scripts", required: false)
++
+     </div>
+ 
+-    @Scripts.Render("~/bundles/bootstrap")
+-    @RenderSection("scripts", required: false)
+ </body>
+ </html>
