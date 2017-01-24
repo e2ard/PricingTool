@@ -25,12 +25,11 @@ public class JOffer
 
     public JOffer(String splr, String prc)
     {
-        Debug.WriteLine(splr);
         switch (splr.ToUpper())
         {
             case "GREEN MOTION":
             case "GREENMOTION":
-           case "GREEN_MOTION":
+            case "GREEN_MOTION":
                 SetGM(splr);
                 SetGMPrice(prc);
                 break;
@@ -218,23 +217,6 @@ public class JOffer
         }
         return "";
     }
-    //public String GetOffer()
-    //{   string offer = validate(supplier, price);
-    //    string gmOffer = validate(gmSupplier, gmPrice);
-    //    string crOffer = validate(crSupplier, crPrice);
-
-    //    List<Supplier> supplierList = new List<Supplier> { GMotion, CRent, Other, Best };
-
-    //    supplierList.OrderBy(o => o.price);
-
-    //    string offerStr = String.Empty;
-
-    //    foreach(Supplier sup in supplierList){
-    //        if(sup.price > 0)
-    //            offerStr += sup + "\n";
-    //    }
-    //    return offerStr;
-    //}
 
     public String GetOffer1()
     {// a price b gnPrice c crPrice
@@ -403,13 +385,6 @@ public class JOffer
     {
         public string name;
         public float price;
-
-        //public override string ToString()
-        //{
-        //    if (price > 10000 || price == 0)
-        //        return "";
-        //    return string.IsNullOrEmpty(name) && name.Length > 3 ? name.Substring(0, 2) + " " + price : name + " " + price;
-        //}
     }
 }
 

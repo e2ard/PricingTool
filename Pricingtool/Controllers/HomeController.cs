@@ -17,27 +17,27 @@ namespace getLayout.Controllers
     public class HomeController : Controller
     {
         PricingToolDal dal = new PricingToolDal();
-        public ActionResult Index()
-        {
-            //ViewBag.ReturnUrl = returnUrl;
-            if (User.Identity.IsAuthenticated)
-            {
-                ViewBag.Locations = dal.GetLocations();
-                ViewBag.Sources = dal.GetSources();
-                ViewBag.Countries = dal.GetCoutries();
-                return View();
-            }
-            else
-                return RedirectToAction("Login", "Account");
-        }
-
         //public ActionResult Index()
         //{
-        //    ViewBag.Locations = dal.GetLocations();
-        //    ViewBag.Sources = dal.GetSources();
-        //    ViewBag.Countries = dal.GetCoutries();
-        //    return View(new SearchFilters());
+        //    //ViewBag.ReturnUrl = returnUrl;
+        //    if (User.Identity.IsAuthenticated)
+        //    {
+        //        ViewBag.Locations = dal.GetLocations();
+        //        ViewBag.Sources = dal.GetSources();
+        //        ViewBag.Countries = dal.GetCoutries();
+        //        return View();
+        //    }
+        //    else
+        //        return RedirectToAction("Login", "Account");
         //}
+
+        public ActionResult Index()
+        {
+            ViewBag.Locations = dal.GetLocations();
+            ViewBag.Sources = dal.GetSources();
+            ViewBag.Countries = dal.GetCoutries();
+            return View(new SearchFilters());
+        }
 
         [HttpPost]
         public ActionResult Index(SearchFilters searchFilters)

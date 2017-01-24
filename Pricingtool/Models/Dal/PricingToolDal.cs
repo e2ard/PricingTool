@@ -25,7 +25,7 @@ namespace PricingTool.MVC.Models.Dal
                   new SelectListItem {Selected = false, Text = "Lithuania", Value = "2"},
                   new SelectListItem{ Selected = false,Text = "Poland", Value = "3"},
                   //new SelectListItem{ Selected = false,Text = "UK", Value = "4"},
-                  new SelectListItem{ Selected = false,Text = "Italy", Value = "5"},
+                  //new SelectListItem{ Selected = false,Text = "Italy", Value = "5"},
                   //new SelectListItem{ Selected = false,Text = "Czech", Value = "6"}
             }, "Value", "Text");
         }
