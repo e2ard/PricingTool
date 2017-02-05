@@ -17,6 +17,7 @@ namespace PricingTool.MVC.Controllers.App_Code
         public Trawler(string site1)
         {
             SetSiteName(site1);
+            SetTitle(ParseTitle(site1));
         }
 
         public override void InitDate(DateTime date)
@@ -67,14 +68,18 @@ namespace PricingTool.MVC.Controllers.App_Code
             switch(locationCode)
             {
                 case "3224":
-                    return "Vilnius1";
+                    return "Vilnius";
                 case "4674":
-                    return "Kaunas1";
+                    return "Kaunas";
                 case "3204":
                 case "150965":
-                    return "Warsaw1";
+                    return "Warsaw";
                 case "4305":
-                    return "Riga1";
+                    return "Riga";
+                case "3197":
+                    return "Krakow";
+                case "3195":
+                    return "Gdansk";
             }
             return "Unknown";
         }
@@ -87,7 +92,7 @@ namespace PricingTool.MVC.Controllers.App_Code
             }
             catch
             {
-                return "Warshaw"; //TOFIX 
+                return "Unknown"; //TOFIX 
             }
         }
 
@@ -105,7 +110,7 @@ namespace PricingTool.MVC.Controllers.App_Code
             return temp.Substring(temp.Length - 11, 2);
         }
 
-        public override string GetTitle()
+        public override string ParseTitle(string siteName)
         {
             string pattern = ".*(\\.).{3}\\/";
             Match matchDetails = Regex.Match(GetSiteName(), pattern);

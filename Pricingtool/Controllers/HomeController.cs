@@ -61,9 +61,9 @@ namespace getLayout.Controllers
                         case 3:
                             fileName = GetScannerPdf(searchFilters);
                             break;
-                        case 4:
-                            fileName = GetEconomyPdf(searchFilters);
-                            break;
+                        //case 4:
+                        //    fileName = GetEconomyPdf(searchFilters);
+                        //    break;
                     }
                     byte[] fileBytes = System.IO.File.ReadAllBytes(Server.MapPath("~/" + fileName));
                     ViewBag.Message = "Done";
@@ -95,12 +95,12 @@ namespace getLayout.Controllers
                     case 3:
                         fileName = GetScannerPdf(searchFilters);
                         break;
-                    case 4:
-                        fileName = GetEconomyPdf(searchFilters);
-                        break;
-                    case 5:
-                        fileName = GetVehicleRentPdf(searchFilters);
-                        break;
+                    //case 4:
+                    //    fileName = GetEconomyPdf(searchFilters);
+                    //    break;
+                    //case 5:
+                    //    fileName = GetVehicleRentPdf(searchFilters);
+                    //    break;
                 }
                 return fileName;
             }
@@ -226,12 +226,12 @@ namespace getLayout.Controllers
                     case 3:
                         fileName = GetScannerExcel(searchFilters);
                         break;
-                    case 4:
-                        fileName = GetEconomyPdf(searchFilters);
-                        break;
-                    default:
-                        fileName = GetRentalExcel(searchFilters);
-                        break;
+                    //case 4:
+                    //    fileName = GetEconomyPdf(searchFilters);
+                    //    break;
+                    //default:
+                    //    fileName = GetRentalExcel(searchFilters);
+                    //    break;
                 }
                 return fileName;
             }
@@ -353,38 +353,38 @@ namespace getLayout.Controllers
             return CreatePdf(s, offerMap);
         }
 
-        public string GetVehicleRentPdf(SearchFilters searchFilters)
-        {
-            DateTime sDate = searchFilters.PuDate.AddHours(searchFilters.PuTime.Hours).AddMinutes(searchFilters.PuTime.Minutes);
-            DateTime eDate = searchFilters.DoDate.AddHours(searchFilters.DoTime.Hours).AddMinutes(searchFilters.DoTime.Minutes);
+        //public string GetVehicleRentPdf(SearchFilters searchFilters)
+        //{
+        //    DateTime sDate = searchFilters.PuDate.AddHours(searchFilters.PuTime.Hours).AddMinutes(searchFilters.PuTime.Minutes);
+        //    DateTime eDate = searchFilters.DoDate.AddHours(searchFilters.DoTime.Hours).AddMinutes(searchFilters.DoTime.Minutes);
 
-            Vehicle s = new Vehicle(Const.Locations[searchFilters.Location].EcoBoking);
-            s.InitDate(sDate);
+        //    Vehicle s = new Vehicle(Const.Locations[searchFilters.Location].EcoBoking);
+        //    s.InitDate(sDate);
 
-            int numOfIterations = (eDate - sDate).Days;
+        //    int numOfIterations = (eDate - sDate).Days;
 
-            List<string> links = s.GetGeneratedLinksByDate(sDate, eDate);
-            List<JOffer> minOffers = new List<JOffer>();
+        //    List<string> links = s.GetGeneratedLinksByDate(sDate, eDate);
+        //    List<JOffer> minOffers = new List<JOffer>();
 
-            Dictionary<string, Dictionary<string, JOffer>> offerMap = new Dictionary<string, Dictionary<string, JOffer>>();
+        //    Dictionary<string, Dictionary<string, JOffer>> offerMap = new Dictionary<string, Dictionary<string, JOffer>>();
 
-            for (int i = 0; i < links.Count; i++)
-                offerMap.Add(links[i], new Dictionary<string, JOffer>());
+        //    for (int i = 0; i < links.Count; i++)
+        //        offerMap.Add(links[i], new Dictionary<string, JOffer>());
 
 
-            for (int i = 0; i < links.Count; i++)
-            {
-                JSourceReader reader = new JSourceReader();
-                List<JOffer> offers = reader.GetVehicleOffers(
-                                    reader.GetVehicleSource(links.ElementAt(i)));
+        //    for (int i = 0; i < links.Count; i++)
+        //    {
+        //        JSourceReader reader = new JSourceReader();
+        //        List<JOffer> offers = reader.GetVehicleOffers(
+        //                            reader.GetVehicleSource(links.ElementAt(i)));
 
-                offerMap[links.ElementAt(i)] =
-                        reader.GetMapNorwegian(offers);
+        //        offerMap[links.ElementAt(i)] =
+        //                reader.GetMapNorwegian(offers);
 
-            }
+        //    }
 
-            return CreatePdf(s, offerMap);
-        }
+        //    return CreatePdf(s, offerMap);
+        //}
 
         public string GetCarTrawlerExcel(SearchFilters searchFilters)
         {
@@ -482,11 +482,11 @@ namespace getLayout.Controllers
 
         public string GetScannerPdf(SearchFilters searchFilters)
         {
-            Scanner s = new Scanner(Const.Locations[searchFilters.Location].CarScanner);
+            Trawler s = new Trawler(Const.Locations[searchFilters.Location].CarScanner);
             DateTime sDate = searchFilters.PuDate.AddHours(searchFilters.PuTime.Hours).AddMinutes(searchFilters.PuTime.Minutes);
             DateTime eDate = searchFilters.DoDate.AddHours(searchFilters.DoTime.Hours).AddMinutes(searchFilters.DoTime.Minutes);
-
             s.InitDate(sDate);
+            
 
             int numOfIterations = (eDate - sDate).Days;
 
@@ -534,7 +534,7 @@ namespace getLayout.Controllers
                 if (completed == 0)
                     break;
             }
-
+            s.SetTitle("scanner");
             return CreatePdf(s, offerMap);
         }
 
@@ -633,38 +633,38 @@ namespace getLayout.Controllers
             return filename;
         }
 
-        public string GetEconomyPdf(SearchFilters searchFilters)
-        {
-            DateTime sDate = searchFilters.PuDate;
-            DateTime eDate = searchFilters.DoDate;
-            EcoBookings s = new EcoBookings(Const.Locations[searchFilters.Location].EcoBoking);
-            JSourceReader s1 = new JSourceReader();
-            sDate = sDate.AddDays(1);
-            eDate = eDate.AddDays(1);
-            s.InitDate(sDate);
+        //public string GetEconomyPdf(SearchFilters searchFilters)
+        //{
+        //    DateTime sDate = searchFilters.PuDate;
+        //    DateTime eDate = searchFilters.DoDate;
+        //    EcoBookings s = new EcoBookings(Const.Locations[searchFilters.Location].EcoBoking);
+        //    JSourceReader s1 = new JSourceReader();
+        //    sDate = sDate.AddDays(1);
+        //    eDate = eDate.AddDays(1);
+        //    s.InitDate(sDate);
 
-            int numOfIterations = (eDate - sDate).Days;
+        //    int numOfIterations = (eDate - sDate).Days;
 
-            List<string> links = s.GetGeneratedLinksByDate(sDate, eDate);
-            List<JOffer> minOffers = new List<JOffer>();
-            Dictionary<string, Dictionary<string, JOffer>> offerMap = new Dictionary<string, Dictionary<string, JOffer>>();
+        //    List<string> links = s.GetGeneratedLinksByDate(sDate, eDate);
+        //    List<JOffer> minOffers = new List<JOffer>();
+        //    Dictionary<string, Dictionary<string, JOffer>> offerMap = new Dictionary<string, Dictionary<string, JOffer>>();
 
-            for (int i = 0; i < links.Count; i++)
-                offerMap.Add(links[i], new Dictionary<string, JOffer>());
+        //    for (int i = 0; i < links.Count; i++)
+        //        offerMap.Add(links[i], new Dictionary<string, JOffer>());
 
-            List<Thread> threads = new List<Thread>();
-            for (int i = 0; i < links.Count; i++)
-            {
-                JSourceReader reader = new JSourceReader();
-                List<JOffer> offers = reader.GetBookingOffers(
-                                    reader.GetBookingsSource(links.ElementAt(i), links.ElementAt(i)));
+        //    List<Thread> threads = new List<Thread>();
+        //    for (int i = 0; i < links.Count; i++)
+        //    {
+        //        JSourceReader reader = new JSourceReader();
+        //        List<JOffer> offers = reader.GetBookingOffers(
+        //                            reader.GetBookingsSource(links.ElementAt(i), links.ElementAt(i)));
 
-                offerMap[links.ElementAt(i)] =
-                        reader.GetMapNorwegian(offers);
+        //        offerMap[links.ElementAt(i)] =
+        //                reader.GetMapNorwegian(offers);
 
-            }
-            return CreatePdf(s, offerMap);
-        }
+        //    }
+        //    return CreatePdf(s, offerMap);
+        //}
 
         public string GetExpediaPdf(SearchFilters searchFilters)
         {
@@ -741,6 +741,8 @@ namespace getLayout.Controllers
                     sl.Add(new SelectListItem { Selected = false, Text = "Kaunas", Value = "2" });
                     break;
                 case 3:
+                    sl.Add(new SelectListItem { Selected = false, Text = "Gdansk", Value = "12" });
+                    sl.Add(new SelectListItem { Selected = false, Text = "Krakow", Value = "11" });
                     sl.Add(new SelectListItem { Selected = false, Text = "Warsaw (Chopin)", Value = "4" });
                     sl.Add(new SelectListItem { Selected = false, Text = "Warsaw (Modlin)", Value = "9" });
                     break;

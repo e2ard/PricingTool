@@ -135,7 +135,7 @@ namespace PricingTool.MVC.Controllers.App_Code
                         Debug.WriteLine("-------------> category not pursed");
                     //transmission ------------------------------------------------
                     string transm = string.Empty;
-                    string[] transmStrgs = { ".//li[contains(@class,'result_trans')]", ".//span[contains(@class,'class mini')]", ".//ul[contains(@class, 'carResultRow_CarSpec-tick')]/li[last()]" };
+                    string[] transmStrgs = { ".//li[contains(@class,'result_trans')]", ".//span[contains(@class,'class mini')]", ".//ul[contains(@class, 'carResultRow_CarSpec-tick')]/li[2]" };
                     HtmlNode transmNode = null;
                     for (int i = 0; i < transmStrgs.Count() && transmNode == null; i++)
                     {

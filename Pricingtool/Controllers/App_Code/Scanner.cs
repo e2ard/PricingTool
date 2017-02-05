@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 public class Scanner : SiteBase
 {
+    string pattern = "PickUpDateTime%22%3A%22201\\d-\\d\\d-[^-T]*";
+
     public Scanner(string site1)
     {
         SetSiteName(site1);
     }
-
-
 
     public override void InitDate(DateTime date)
     {
@@ -55,22 +55,28 @@ public class Scanner : SiteBase
         }
         catch
         {
-            return "Warshaw"; //TOFIX 
+            return "Unknown"; //TOFIX 
         }
     }
 
     public override string GetPuDay()
     {
-        string pattern = "PickUpDateTime%22%3A%22201\\d-\\d\\d-[^-T]*";
         Match matchDetails = Regex.Match(GetSiteName(), pattern);
+        if (!matchDetails.Success)
+        {
+           matchDetails = Regex.Match(GetSiteName(), "PickUpDateTime%22:%22201(\\d)-\\d+-\\d+T\\d+:\\d+");
+        }
         string temp = matchDetails.Captures[0].Value;
         return temp.Substring(temp.Length - 2, 2);
     }
 
     public override string GetPuMonth()
     {
-        string pattern = "PickUpDateTime%22%3A%22201\\d-\\d\\d-[^-T]*";
         Match matchDetails = Regex.Match(GetSiteName(), pattern);
+        if (!matchDetails.Success)
+        {
+            matchDetails = Regex.Match(GetSiteName(), "PickUpDateTime%22:%22201(\\d)-\\d+-\\d+T\\d+:\\d+");
+        }
         string temp = matchDetails.Captures[0].Value;
         return temp.Substring(temp.Length - 5, 2);
     }
@@ -94,6 +100,6 @@ public class Scanner : SiteBase
 
     public override string GetPuYear()
     {
-        return "2016";
+        return "2017";
     }
 }

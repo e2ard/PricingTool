@@ -10,12 +10,22 @@ namespace PricingTool.MVC.Controllers.App_Code
     public abstract class SiteBase
     {
         protected string siteName;
-
+        protected string Title;
         public void SetSiteName(string siteName1)
         {
             siteName = siteName1;
+            SetTitle(ParseTitle(siteName1));
         }
 
+        public void SetTitle(string title)
+        {
+            Title = title;
+        }
+
+        public virtual string GetTitle()
+        {
+            return Title;
+        }
         public string GetSiteName()
         {
             return siteName;
@@ -58,10 +68,10 @@ namespace PricingTool.MVC.Controllers.App_Code
 
         public abstract string GetPuYear();
 
-        public virtual string GetTitle()
+        public virtual string ParseTitle(string siteName)
         {
             string pattern = ".*(\\.).{3}\\/";
-            Match matchDetails = Regex.Match(GetSiteName(), pattern);
+            Match matchDetails = Regex.Match(siteName, pattern);
 
             string title = matchDetails.Captures[0].Value.Substring(pattern.Length - 5, matchDetails.Captures[0].Value.Length - (pattern.Length - 5));
 

@@ -318,11 +318,13 @@ public class JOffer
             case "CCMR":
             case "CDMN":
             case "CCMN":
+            case "CWMR":
                 return "CompactM";
             case "CDAR":
             case "CCAR":
             case "CDAN":
             case "CCAN":
+            case "CWAR":
                 return "CompactA";
             case "IDMR":
             case "ICMR":
@@ -338,11 +340,9 @@ public class JOffer
                 return "StandardA";
             case "SWMR":
             case "IWMR":
-            case "CWMR":
                 return "EstateM";
             case "SWAR":
             case "IWAR":
-            case "CWAR":
                 return "EstateA";
             case "CFMR":
             case "EFMR":
