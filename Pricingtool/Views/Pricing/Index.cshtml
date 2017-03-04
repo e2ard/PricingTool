@@ -1,4 +1,12 @@
-﻿@model PricingTool.MVC.Models.SearchFilters
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Pricing</h2>
+
+@model PricingTool.MVC.Models.SearchFilters
 @{
     Layout = "/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Pricing Tool";
@@ -21,16 +29,16 @@
 
         }
         $(document).ready(function () {
-            $('#pdfBtn').click(function () {
+            $('form').submit(function () {
                 if ($('form').valid()){
                     $.ajax({
-                        url: '@Url.Action("GetResultFileName")',
+                        url: '@Url.Action("GeneratePrices")',
                         type: "POST",
                         data: $('form').serialize(),
                         success: function (result) {
                             StopLoading();
-                            if (result.length > 0)
-                                window.open(result, '_blank');
+                            console.log(result + new Date());
+                            alert(result + new Date());
                         },
                         error: function (result) {
                             StopLoading();
@@ -64,7 +72,7 @@
                 }
             });
         });
-    
+
         function AddDays(date, addDays) {
             var dat = new Date(date.valueOf());
             dat.setDate(dat.getDate() + addDays);
@@ -127,23 +135,19 @@
             $('#DoDate').datetimepicker({
                 format: 'DD-MM-YYYY',
                 minDate: AddDays(new Date(), 1),
-                maxDate: AddDays(new Date(), 29)
+                //maxDate: AddDays(new Date(), 29)
             });
 
-            $('#PuDate').val(DateToString(AddDays(new Date(), 1)));
-            $('#DoDate').val(DateToString(AddDays(GetDateFromString($("#PuDate").val()), 6)));
+            $('#PuDate').val(DateToString(AddDays(new Date(2017,10,01), 0)));
+            $('#DoDate').val(DateToString(AddDays(GetDateFromString($("#PuDate").val()), 9)));
 
             $("#PuDate").on("dp.change", function (e) {
-                var puDate = $("#PuDate").val();
-                $('#DoDate').data("DateTimePicker").maxDate(AddDays(GetDateFromString(puDate), 29))
-                $('#DoDate').data("DateTimePicker").minDate(AddDays(GetDateFromString(puDate), 1));
-
-                //$('#DoDate').datetimepicker({
-                //    format: 'DD-MM-YYYY',
-                //    minDate: AddDays(GetDateFromString(puDate), 29),
-                //    maxDate: AddDays(GetDateFromString(puDate), 1)
-                //});
-                $('#DoDate').val(DateToString(AddDays(GetDateFromString(puDate), 6)));
+                if (!isNaN(GetDateFromString($("#PuDate").val()).getTime())) {
+                    $('#DoDate').data("DateTimePicker").minDate(AddDays(GetDateFromString($("#PuDate").val()), 1));
+                    //$('#DoDate').data("DateTimePicker").maxDate(AddDays(GetDateFromString($("#PuDate").val()), 29));
+                    $('#DoDate').val(DateToString(AddDays(GetDateFromString($("#PuDate").val()), 9)));
+                    $(this).datepicker('hide');
+                }
             });
 
             $('#DoTime').datetimepicker({
@@ -219,20 +223,17 @@
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true)
         <div class="form-group row">
-            <div class="form-group col-md-6">
-                @Html.LabelFor(model => model.Source, new { @class = "control-label-custom" })
-                @Html.DropDownListFor(m => m.Source, new SelectList(ViewBag.Sources, "Value", "Text", 0), new { @class = "form-control" })
-            </div>
+            
         </div>
 
         <div class="form-group row">
             <div class="form-group col-md-6">
-                @Html.LabelFor(model => model.Country, new { @class = "control-label-custom" })
-                @Html.DropDownListFor(m => m.Country, new SelectList(ViewBag.Countries, "Value", "Text", 0), new { @class = "form-control" })
+                @Html.LabelFor(model => model.Source, new { @class = "control-label-custom" })
+                @Html.DropDownListFor(m => m.Source, new SelectList(new List<SelectListItem>(), "Value", "Text", 0), new { @class = "form-control" })
             </div>
             <div class="form-group col-md-6">
                 @Html.LabelFor(model => model.Location, new { @class = "control-label-custom" })
-                @Html.DropDownListFor(m => m.Location, new SelectList(ViewBag.Countries, "Value", "Text", 0), "Please select", new { @class = "form-control" })
+                @Html.DropDownListFor(m => m.Location, new SelectList(ViewBag.Locations, "Value", "Text", 0), new { @class = "form-control" })
             </div>
         </div>
 
@@ -241,7 +242,7 @@
                 <label class="control-label control-label-custom" style="width:97px">Pick-up date</label>
                 <div class="input-group col-md-12" style="margin-left: 0px; padding-left: 0px; padding-right: 0px;">
                     <span class="input-group-addon" style="background-color: #a9d300; color: #fff"><span class="glyphicon glyphicon-calendar"></span></span>
-                    @Html.TextBoxFor(m => m.PuDate, new { @class = "form-control", style = "padding:5px;width: 90px;" })
+                    @Html.TextBoxFor(m => m.PuDate, new { @class = "form-control", style = "padding:5px;width: 90px;", @Value="2017-10-15" })
                     @Html.TextBoxFor(m => m.PuTime, new { @class = "form-control form-fixer", style = "width: 50px;" })
                 </div>
             </div>
@@ -250,22 +251,24 @@
                 <label class="control-label control-label-custom">Drop-off date</label>
                 <div class="input-group col-md-12" style="margin-left: 0px; padding-left: 0px; padding-right: 0px">
                     <span class="input-group-addon" style="background-color: #a9d300; color: #fff"><span class="glyphicon glyphicon-calendar" style="background-color: #a9d300; color: #fff"></span></span>
-                    @Html.TextBoxFor(m => m.DoDate, new { @class = "form-control", style = "padding:5px;width: 90px;" })
+                    @Html.TextBoxFor(m => m.DoDate, new { @class = "form-control", style = "padding:5px;width: 90px;", @Value = "2017-10-23" })
                     @Html.TextBoxFor(m => m.DoTime, new { @class = "form-control form-fixer", style = "width: 50px;" })
                 </div>
             </div>
 
-           
+
         </div>
 
-        <div class="form-group col-md-12">
-            <button id="pdfBtn" type="button" class="btn btn-lg btn-xlarge" style="background-color: #a9d300; width:130px">
+        <div class="form-group col-lg-offset-2 col-md-10">
+            <button id="pdfBtn" type="submit" class="btn btn-lg btn-xlarge" style="background-color: #a9d300; width:130px">
                 Get PDF<span id="divLoading" style="margin-left: 5px;"></span>
             </button>
 
             @*<a href="@Url.Action("ExcelPackageCreate")" id="excelBtn" type="button" class="btn btn-lg btn-xlarge" style="background-color: #a9d300;width:130px">
-                Get EXCEL<span id="divLoadingExcel" style="margin-left: 5px;"></span>
-            </a>*@
+                    Get EXCEL<span id="divLoadingExcel" style="margin-left: 5px;"></span>
+                </a>*@
         </div>
     }
 </div>
+
+

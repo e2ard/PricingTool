@@ -295,17 +295,17 @@ namespace getLayout.Controllers
 
         public string GetCarTrawlerPdf(SearchFilters searchFilters)
         {
-            DateTime sDate = searchFilters.PuDate.AddHours(searchFilters.PuTime.Hours).AddMinutes(searchFilters.PuTime.Minutes);
-            DateTime eDate = searchFilters.DoDate.AddHours(searchFilters.DoTime.Hours).AddMinutes(searchFilters.DoTime.Minutes);
+            //DateTime sDate = searchFilters.PuDate.AddHours(searchFilters.PuTime.Hours).AddMinutes(searchFilters.PuTime.Minutes);
+            //DateTime eDate = searchFilters.DoDate.AddHours(searchFilters.DoTime.Hours).AddMinutes(searchFilters.DoTime.Minutes);
 
             Trawler s = new Trawler(Const.Locations[searchFilters.Location].CarTrawler);
-            s.InitDate(sDate);
+            s.InitDate(searchFilters.PuDate);
 
 
 
-            int numOfIterations = (eDate - sDate).Days;
+            int numOfIterations = (searchFilters.DoDate - searchFilters.PuDate).Days;
 
-            List<string> links = s.GetGeneratedLinksByDate(sDate, eDate);
+            List<string> links = s.GetGeneratedLinksByDate(searchFilters.PuDate, searchFilters.DoDate);
             List<JOffer> minOffers = new List<JOffer>();
 
             Dictionary<string, Dictionary<string, JOffer>> offerMap = new Dictionary<string, Dictionary<string, JOffer>>();
@@ -351,6 +351,66 @@ namespace getLayout.Controllers
             }
 
             return CreatePdf(s, offerMap);
+        }
+
+        public Dictionary<string, Dictionary<string, JOffer>> GetCarTrawlerRates(SearchFilters searchFilters)
+        {
+            searchFilters.PuDate = searchFilters.PuDate.AddHours(searchFilters.PuTime.Hours).AddMinutes(searchFilters.PuTime.Minutes);
+            searchFilters.DoDate = searchFilters.DoDate.AddHours(searchFilters.DoTime.Hours).AddMinutes(searchFilters.DoTime.Minutes);
+
+            Trawler s = new Trawler(Const.Locations[searchFilters.Location].CarTrawler);
+            s.InitDate(searchFilters.PuDate);
+
+
+
+            int numOfIterations = (searchFilters.DoDate - searchFilters.PuDate).Days;
+
+            List<string> links = s.GetGeneratedLinksByDate(searchFilters.PuDate, searchFilters.DoDate);
+            List<JOffer> minOffers = new List<JOffer>();
+
+            Dictionary<string, Dictionary<string, JOffer>> offerMap = new Dictionary<string, Dictionary<string, JOffer>>();
+
+            for (int i = 0; i < links.Count; i++)
+                offerMap.Add(links[i], new Dictionary<string, JOffer>());
+
+
+            List<Thread> threads = new List<Thread>();
+            //--- Start all threads
+            for (int index = 0; index < links.Count; index++)
+            {
+                Thread thread = new Thread(() =>
+                {
+                    JSourceReader reader = new JSourceReader();
+                    offerMap[Thread.CurrentThread.Name == null ?
+                        links.ElementAt(0) :
+                        Thread.CurrentThread.Name] =
+                            reader.GetMapNorwegian(reader.GetNorwRates(Thread.CurrentThread.Name));
+                });
+                thread.Name = links.ElementAt(index);
+                threads.Add(thread);
+                thread.Start();
+            }
+
+            //check if threads has done
+            Boolean allCompleted = false;
+            while (!allCompleted)
+            {
+                int completed = links.Count;
+                for (int i = 0; i < links.Count; i++)
+                {
+                    if (!threads.ElementAt(i).IsAlive)
+                        --completed;
+                    else
+                    {
+                        Thread.Sleep(100);
+                        break;
+                    }
+                }
+                if (completed == 0)
+                    break;
+            }
+
+            return offerMap;
         }
 
         //public string GetVehicleRentPdf(SearchFilters searchFilters)
@@ -728,6 +788,11 @@ namespace getLayout.Controllers
 
         }
 
+        public ActionResult News()
+        {
+            return View();
+        }
+
         public JsonResult GetLocations(int? country)
         {
             List<SelectListItem> sl = new List<SelectListItem>();
@@ -761,12 +826,12 @@ namespace getLayout.Controllers
                     break;
             }
             IEnumerable<SelectListItem> data = new SelectList(sl, "Value", "Text");
-            JsonResult jsonResult = new JsonResult()
+            
+            return new JsonResult()
             {
                 Data = data,
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
             };
-            return jsonResult;
         }
 
         public ActionResult About()

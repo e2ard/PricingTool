@@ -69,9 +69,15 @@ namespace PricingTool.MVC.Controllers.App_Code
                     client.Headers.Add("Accept", "*/*");
                     client.Headers.Add("Accept-Language", "en-gb,en;q=0.5");
                     client.Headers.Add("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+                    if (addProxy)
+                    {
+                        WebProxy proxy = new WebProxy(ipStr, port);
+                        proxy.Credentials = new NetworkCredential(user, pass);
+                        client.Proxy = proxy;
+                    }
                     string source = client.DownloadString(site);
                     //retrieve page source tags
-                    HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+                    HtmlDocument doc = new HtmlDocument();
                     doc.LoadHtml(source);
 
                     string[] carOfferStrgs = { "car-result group ", "search-result txt-grey-7 ", "carResultDiv " };
@@ -158,7 +164,22 @@ namespace PricingTool.MVC.Controllers.App_Code
                     if (seatsNode == null)
                         Debug.WriteLine("-------------> seats not pursed");
 
-                    JOffer o = setOfferValues(supplier, price, category, transm, seats);
+                    //car name ------------------------------------------------
+                    string carName = string.Empty;
+                    string[] carNameStrgs = { ".//td[contains(@class,'carResultRow_CarSpec')]" };
+                    HtmlNode carNameNode = null;
+                    for (int i = 0; i < carNameStrgs.Count() && carNameNode == null; i++)
+                    {
+                        carNameNode = mainNode.SelectSingleNode(carNameStrgs[i]);
+                        if (carNameNode != null)
+                            carName = carNameNode.InnerText.Split('&')[0];
+                    }
+                    if (carNameNode == null)
+                        Debug.WriteLine("-------------> carName not pursed");
+
+                    JOffer o = new JOffer(supplier, price, category, transm, seats);
+                    if (carName.ToLower().Contains("renault clio estate") && o.transmission.Equals("A"))
+                        o.category = "Economy";
                     offers.Add(o);
                 }
             }
@@ -168,16 +189,6 @@ namespace PricingTool.MVC.Controllers.App_Code
             return offers;
         }
 
-        public JOffer setOfferValues(string supplier, string price, string category, string transm, string seats)
-        {
-            JOffer o = new JOffer(supplier, price);
-
-            o.category = category;
-            o.transmission = transm.Trim().Split(' ')[0].Substring(0, 1);
-            o.seats = seats.Trim().Substring(0, 1);
-            return o;
-        }
-
         public Dictionary<string, JOffer> GetMap(List<JOffer> offers)
         {
             Dictionary<string, JOffer> dayOffers = new Dictionary<string, JOffer>();
@@ -185,11 +196,8 @@ namespace PricingTool.MVC.Controllers.App_Code
             {
                 string offerKey = o.category + o.transmission;
                 if (offerKey.Equals("People CarrierM") && !o.seats.Equals("9"))
-                {
-                    //Debug.WriteLine("-----> dayOffers " + o.GetOffer() + " " + o.seats.Equals("9"));
-                    continue;
-                }
-
+                   continue;
+               
                 if (dayOffers.ContainsKey(offerKey))
                 {
                     if (o.GetPrice() < dayOffers[offerKey].GetPrice() && o.GetPrice() != 0 || dayOffers[offerKey].GetPrice() == 0)
@@ -221,11 +229,8 @@ namespace PricingTool.MVC.Controllers.App_Code
             {
                 string offerKey = o.category;
                 if (o.category.Equals("skip"))
-                {
-                    //Debug.WriteLine("-----> dayOffers " + o.GetOffer() + " " + o.seats.Equals("9"));
                     continue;
-                }
-
+                
                 if (dayOffers.ContainsKey(o.category))
                 {
                     if (o.GetPrice() < dayOffers[offerKey].GetPrice() && o.GetPrice() != 0 || dayOffers[offerKey].GetPrice() == 0)
@@ -252,56 +257,48 @@ namespace PricingTool.MVC.Controllers.App_Code
 
         public List<JOffer> GetNorwRates(string url)
         {
-            // Create a request for the URL. 
-            WebRequest request = WebRequest.Create(url);
-
-            // If required by the server, set the credentials.
-            //request.Credentials = CredentialCache.DefaultCredentials;
-            // Get the response.
+            WebRequest request = WebRequest.Create(url);// Create a request for the URL. 
             if (addProxy)
             {
                 WebProxy proxy = new WebProxy(ipStr, port);
                 proxy.Credentials = new NetworkCredential(user, pass);
                 request.Proxy = proxy;
             }
-            WebResponse response = request.GetResponse();
-            // Display the status.
-            //Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-            // Get the stream containing content returned by the server.
-            Stream dataStream = response.GetResponseStream();
-            // Open the stream using a StreamReader for easy access.
-            StreamReader reader = new StreamReader(dataStream);
-            // Read the content.
-
-            string responseFromServer = reader.ReadToEnd();
-            // Display the content.
-            int remove = Regex.Match(responseFromServer, "(\\w)*\\[\\],").Captures[0].Index + 3;
-
-            string subJson = "{" + responseFromServer.Substring(remove, responseFromServer.Length - 2 - remove);
-
-            JToken entireJson = JToken.Parse(subJson);
-
-            JArray vehVendorAvails = entireJson["VehAvailRSCore"]["VehVendorAvails"].Value<JArray>();// Get suppliers
-            Console.WriteLine(vehVendorAvails.Count);
-
-            List<JOffer> offers = new List<JOffer>();
-            foreach (var item in vehVendorAvails)
+            using (WebResponse response = request.GetResponse())
             {
-                string supplier = item["Vendor"]["@CompanyShortName"].ToString();
-                foreach (var vehicle in item["VehAvails"])
+                using (Stream dataStream = response.GetResponseStream())// Get the stream containing content returned by the server.
                 {
-                    string category = vehicle["VehAvailCore"]["Vehicle"]["@Code"].ToString();// category
-                    string price = vehicle["VehAvailCore"]["TotalCharge"]["@RateTotalAmount"].ToString();//price
-                    JOffer offer = new JOffer(supplier, price);
-                    offer.SetCategory(category);
-                    offers.Add(offer);
+                    StreamReader reader = new StreamReader(dataStream);// Open the stream using a StreamReader for easy access.
+
+                    string responseFromServer = reader.ReadToEnd(); // Read the content.
+
+                    int remove = Regex.Match(responseFromServer, "(\\w)*\\[\\],").Captures[0].Index + 3;
+
+                    string subJson = "{" + responseFromServer.Substring(remove, responseFromServer.Length - 2 - remove);
+
+                    JToken entireJson = JToken.Parse(subJson);
+
+                    JArray vehVendorAvails = entireJson["VehAvailRSCore"]["VehVendorAvails"].Value<JArray>();// Get suppliers
+                    Console.WriteLine(vehVendorAvails.Count);
+
+                    List<JOffer> offers = new List<JOffer>();
+                    foreach (var item in vehVendorAvails)
+                    {
+                        string supplier = item["Vendor"]["@CompanyShortName"].ToString();
+                        foreach (var vehicle in item["VehAvails"])
+                        {
+                            string category = vehicle["VehAvailCore"]["Vehicle"]["@Code"].ToString();// category
+                            string price = vehicle["VehAvailCore"]["TotalCharge"]["@RateTotalAmount"].ToString();//price
+                            JOffer offer = new JOffer(supplier, price);
+                            offer.SetCategory(category);
+                            offers.Add(offer);
+                        }
+                    }
+
+                    reader.Close();// Clean up the streams and the response.
+                    return offers;
                 }
             }
-
-            // Clean up the streams and the response.
-            reader.Close();
-            response.Close();
-            return offers;
         }
 
         public List<JOffer> GetBookingOffers(string jsonStr)

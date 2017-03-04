@@ -1,5 +1,4 @@
 ﻿body {
-    padding-top: 50px;
     padding-bottom: 20px;
 }
 
@@ -47,8 +46,7 @@ input.form-fixer {
     padding:5px;
 }
 body {
-    background: rgba(0, 0, 0, 0) url("http://greenmotion.com/images/tracks.png") no-repeat  ;
-    color: #fff;
+    background: rgba(0, 0, 0, 0) url("http://greenmotion.com/images/tracks.png") no-repeat;
     height: auto;
 }
 .form-group label, .btn-xlarge{

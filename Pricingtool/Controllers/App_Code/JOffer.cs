@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -22,8 +23,10 @@ public class JOffer
     public string transmission;
     public string category;
     public string seats;
+    public string carName;
 
-    public JOffer(String splr, String prc)
+
+    private void SetSupplierPrice(string splr, string prc)
     {
         switch (splr.ToUpper())
         {
@@ -40,7 +43,7 @@ public class JOffer
                 SetCRPrice(prc);
                 break;
             case "":
-                SetBest("MyB");
+                SetBest();
                 SetBestPrice(prc);
                 break;
             default:
@@ -50,12 +53,24 @@ public class JOffer
         }
     }
 
-    private void SetBest(string splr)
+    public JOffer(string splr, string prc)
+    {
+        SetSupplierPrice(splr, prc);
+    }
+    public JOffer (string supplier, string price, string category, string transm, string seats)
+    {
+        SetSupplierPrice(supplier, price);
+        this.category = category;
+        transmission = transm.Trim().Split(' ')[0].Substring(0, 1);
+        this.seats = seats.Trim().Substring(0, 1);
+    }
+
+    private void SetBest()
     {
         bestSupplier = "Best";
     }
 
-    public JOffer(String splr, float prc)
+    public JOffer(string splr, float prc)
     {
         switch (splr.ToUpper())
         {
@@ -71,7 +86,7 @@ public class JOffer
                 SetCRPrice(prc);
                 break;
             case "":
-                SetBest("MyB");
+                SetBest();
                 SetBestPrice(prc);
                 break;
             default:
@@ -83,7 +98,7 @@ public class JOffer
 
     public JOffer() { }
 
-    public void SetSupplier(String splr)
+    public void SetSupplier(string splr)
     {
         supplier = splr;
     }
@@ -103,14 +118,14 @@ public class JOffer
         siteName = site;
     }
 
-    public String GetSupplier()
+    public string GetSupplier()
     {
         return this.supplier;
     }
 
     public void SetPrice(string price)
     {
-        this.price = (float)Math.Round(float.Parse(Regex.Match(price.Replace(',', '.'), "\\d+\\.?\\d+").Value),2);
+        this.price = ParsePrice(price);
     }
 
     public void SetPrice(float price)
@@ -123,19 +138,19 @@ public class JOffer
         return this.price;
     }
 
-    public void SetGM(String splr)
+    public void SetGM(string splr)
     {
         this.gmSupplier = splr;
     }
 
-    public String GetGM()
+    public string GetGM()
     {
         return this.gmSupplier;
     }
 
-    public void SetGMPrice(String price)
+    public void SetGMPrice(string price)
     {
-        this.gmPrice =(float) Math.Round(float.Parse(Regex.Match(price.Replace(',', '.'), "\\d+\\.?\\d+").Value), 2);
+        this.gmPrice = ParsePrice(price);
     }
 
     public void SetGMPrice(float price)
@@ -148,14 +163,14 @@ public class JOffer
         return this.gmPrice;
     }
 
-    public String GetBest()
+    public string GetBest()
     {
         return this.bestSupplier;
     }
 
-    public void SetBestPrice(String price)
+    public void SetBestPrice(string price)
     {
-        this.bestPrice = float.Parse(Regex.Match(price.Replace(',', '.'), "\\d+\\.?\\d+").Value);
+        this.bestPrice = ParsePrice(price);
     }
 
     public void SetBestPrice(float price)
@@ -168,19 +183,24 @@ public class JOffer
         return this.bestPrice;
     }
 
-    public void SetCR(String splr)
+    public void SetCR(string splr)
     {
         this.crSupplier = splr;
     }
 
-    public String GetCR()
+    public string GetCR()
     {
         return this.crSupplier;
     }
 
-    public void SetCRPrice(String price)
+    public void SetCRPrice(string price)
     {
-        this.crPrice = float.Parse(Regex.Match(price.Replace(',', '.'), "\\d+\\.?\\d+").Value);
+        this.crPrice = ParsePrice(price);
+    }
+
+    private float ParsePrice(string price)
+    {
+        return float.Parse(Regex.Match(price.Replace(',', '.'), "\\d+\\.?\\d+").Value, CultureInfo.InvariantCulture);
     }
 
     public void SetCRPrice(float price)
@@ -193,7 +213,7 @@ public class JOffer
         return this.crPrice;
     }
 
-    public String toString()
+    public string toString()
     {
         return supplier + " " + price + " " + category;
     }
@@ -213,71 +233,12 @@ public class JOffer
             if (sup.name.Equals(""))
                 return "-" + " " + sup.price + "\n";
             else
-                return (sup.name.Length > 3? sup.name.ToLower().Substring(0, 4): sup.name.ToLower().Substring(0, 3)) + " " + sup.price + "\n";
+                return (sup.name.Length > 3 ? sup.name.ToLower().Substring(0, 4) : sup.name.ToLower().Substring(0, 3)) + " " + sup.price + "\n";
         }
         return "";
     }
 
-    public String GetOffer1()
-    {// a price b gnPrice c crPrice
-        string offer = validate(supplier, price);//0
-        string gmOffer = validate(gmSupplier, gmPrice);//1
-        string crOffer = validate(crSupplier, crPrice);//2
-
-        string output = string.Empty;
-
-        if (price < gmPrice)
-        {
-            if (price < crPrice)
-            {
-                output += IsEmpty(offer);
-                if (gmPrice < crPrice)
-                {
-                    return output += IsEmpty(gmOffer) + crOffer;
-                }
-                else
-                    return output += IsEmpty(crOffer) + gmOffer;
-            }
-            else
-            {
-                return IsEmpty(crOffer) + IsEmpty(offer) + gmOffer;
-            }
-        }
-        else
-        {
-            if (gmPrice <= crPrice)
-            {
-                if (gmPrice <= price)
-                {
-                    output += IsEmpty(gmOffer);
-                    if (crPrice < price)
-                        return output += IsEmpty(crOffer) + offer;
-                    else
-                        return output += IsEmpty(offer) + crOffer;
-                }
-            }
-            else
-            {
-                if (crPrice < price)
-                {
-                    if (crPrice < gmPrice)
-                    {
-                        output += IsEmpty(crOffer);
-                        if (gmPrice < price)
-                            return output += IsEmpty(gmOffer) + offer;
-                        else
-                            return output += IsEmpty(offer) + gmOffer;
-                    }
-                    else
-                        return offer;
-                }
-
-            }
-        }
-        return "";
-    }
-
-    public String GetOffer()
+    public string GetOffer()
     {// a price b gnPrice c crPrice
         string offer = validate(supplier, price);//0
         string gmOffer = validate(gmSupplier, gmPrice);//1

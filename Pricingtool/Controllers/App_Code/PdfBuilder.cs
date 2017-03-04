@@ -154,6 +154,18 @@ namespace PricingTool.MVC.Controllers.App_Code
                 if (i == 0)
                     chunk.SetAnchor(offers[i].GetSiteName());
                 cell.AddElement(chunk);
+                if (offers[i].price - offers[i].gmPrice < 2.5f && offers[i].price - offers[i].gmPrice > 0)
+                {
+                    cell.BackgroundColor = BaseColor.ORANGE;
+                    if (offers[i].price - offers[i].gmPrice < 1.5f && offers[i].price - offers[i].gmPrice > 0)
+                        cell.BackgroundColor = BaseColor.GREEN;
+
+                }
+                else
+                {
+                    cell.BackgroundColor = BaseColor.RED;
+                }
+
                 table.AddCell(cell);
             }
             table.CompleteRow();
