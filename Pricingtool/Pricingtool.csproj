@@ -204,6 +204,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\PricingHelper.cs" />
+    <Compile Include="Models\PricingModel.cs" />
     <Compile Include="Models\SearchFilters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />

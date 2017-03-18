@@ -9,6 +9,8 @@ namespace PricingTool.MVC.Models
 {
     public class SearchFilters:IValidatableObject
     {
+        public int IntervalNum { get; set; }
+
         [Required(ErrorMessage = "Source not chosen")]
         [Range(1, 100)]
         public int? Source { get; set; }

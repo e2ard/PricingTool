@@ -12,8 +12,8 @@ namespace PricingTool.MVC.Controllers.App_Code
     public class PdfBuilder : IDisposable
     {
         private PdfPTable table;
-        private String documentTitle, city;
-        public String PATH, fileName;
+        private string documentTitle, city;
+        public string PATH, fileName;
         private int puYear, puMonth, puDay;
         public SiteBase SiteName;
         private int dayNum;
@@ -154,12 +154,16 @@ namespace PricingTool.MVC.Controllers.App_Code
                 if (i == 0)
                     chunk.SetAnchor(offers[i].GetSiteName());
                 cell.AddElement(chunk);
-                if (offers[i].price - offers[i].gmPrice < 2.5f && offers[i].price - offers[i].gmPrice > 0)
+                if (offers[i].price > offers[i].gmPrice)
                 {
-                    cell.BackgroundColor = BaseColor.ORANGE;
-                    if (offers[i].price - offers[i].gmPrice < 1.5f && offers[i].price - offers[i].gmPrice > 0)
-                        cell.BackgroundColor = BaseColor.GREEN;
+                    cell.BackgroundColor = BaseColor.BLUE;
+                    if (offers[i].price - offers[i].gmPrice < 2.5f && offers[i].price - offers[i].gmPrice > 0)
+                    {
+                        cell.BackgroundColor = BaseColor.ORANGE;
+                        if (offers[i].price - offers[i].gmPrice < 1.5f && offers[i].price - offers[i].gmPrice > 0)
+                            cell.BackgroundColor = BaseColor.GREEN;
 
+                    }
                 }
                 else
                 {

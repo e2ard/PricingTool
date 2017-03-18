@@ -131,7 +131,7 @@ namespace PricingTool.MVC.Controllers.App_Code
                     string category = string.Empty;
                     string[] categoryStrs = { ".//p[contains(@class,'bg-yellow-5')]", ".//span[contains(@class,'class mini')]", ".//span[contains(@class,'carResultRow_CarSpec_CarCategory')]" };
                     HtmlNode categoryNode = null;
-                    for (int i = 0; i <= categoryStrs.Count() && categoryNode == null; i++)
+                    for (int i = 0; i < categoryStrs.Count() && categoryNode == null; i++)
                     {
                         categoryNode = mainNode.SelectSingleNode(categoryStrs[i]);
                         if (categoryNode != null)
